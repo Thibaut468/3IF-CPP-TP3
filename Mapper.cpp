@@ -15,7 +15,7 @@
 #include <iostream>
 #include <cstring>
 #include <cstdlib>
-#include <unistd.h> 
+#include <unistd.h>
 using namespace std;
 
 //------------------------------------------------------ Include personnel
@@ -41,7 +41,7 @@ int main()
         cout << "\t4: Recherche simple" << endl;
         cout << "\t5: Recherche complexe" << endl;
         cout << "\t6: Chargement d'un catalogue de trajets" << endl;
-        cout << "\t7: sauvegarde du catalogue courant" << endl;
+        cout << "\t7: Sauvegarde du catalogue courant" << endl;
         cout << "\t0: Quitter l'application Mapper" << endl;
 
         char choix;
@@ -69,75 +69,85 @@ int main()
                 break;
             case '6':
             {
-                cout<<"Entrez le nom de ficher(avec l'extension) pour le chargement:"<<endl;
+                cout<<"Entrez le nom de ficher (avec l'extension) pour le chargement :"<<endl;
                 string nomFichier;
                 cin>>nomFichier;
                 //si le nonFicher existe ;  R_OK l'acces read ,oui -> 0 , n'existe pas ou pas de droit de read -> -1
                 /*if(access("nomFicher", R_OK) == -1 ){
-                    cout << "Saisie du ficher n'existe pas ou sans droit de lecture. Recommencer." << endl;
+                    cout << "Saisie du fichier n'existe pas ou sans droit de lecture. Recommencer." << endl;
                     continue;
                 }*/
-                
-                cout<<"Entrez le type de chargement :"<<endl;
-                cout<<"\t1. Sans critère de sélection"<<endl;
-                cout<<"\t2. Selon le type des trajets"<<endl;
-                cout<<"\t3. Selon la ville de départ et / ou la ville d'arrivée"<<endl;
-                cout<<"\t4. Selon une sélection de trajets"<<endl;
-                cin>>choix;
+
+                cout <<"Entrez le type de chargement :" << endl;
+                cout <<"\t1: Sans critère de sélection" << endl;
+                cout <<"\t2: Selon le type des trajets" << endl;
+                cout <<"\t3: Selon la ville de départ et / ou la ville d'arrivée" << endl;
+                cout <<"\t4: Selon une sélection de trajets" << endl;
+                cout <<"\t5: Retour au menu principal" << endl;
+                cin >> choix;
+
                 switch(choix){
                     case '1':
-                    catalogue.Sauvegarde(nomFichier,SANS);
-                    break;
+                        catalogue.Charge(nomFichier,SANS);
+                        break;
                     case '2':
-                    catalogue.Sauvegarde(nomFichier,TYPE);
-                    break;
+                        catalogue.Charge(nomFichier,TYPE);
+                        break;
                     case '3':
-                    catalogue.Sauvegarde(nomFichier,VILLE);
-                    break;
+                        catalogue.Charge(nomFichier,VILLE);
+                        break;
                     case '4':
-                    catalogue.Sauvegarde(nomFichier,TRAJETS);
-                    break;
+                        catalogue.Charge(nomFichier,TRAJETS);
+                        break;
+                    case '5':
+                        break;
                     default:
-                    cout << "Saisie du choix incorrect. Recommencer." << endl;
-                    continue;
+                        cout << "Saisie du choix incorrect. Recommencer." << endl;
+                        continue;
                 }
+
                 break;
             }
             case '7':
             {
-                cout<<"Entrez le nom de ficher(avec l'extension) pour la sauvegarde:"<<endl;
-                string nomFicher;
-                cin>>nomFicher;
+                cout << "Entrez le nom de ficher (avec l'extension) pour la sauvegarde :" << endl;
+                string nomFichier;
+                cin >> nomFichier;
                 //si le nonFicher existe ;  F_OK exisitance , oui -> 0 , non -> -1
                 /*if(access( "nomFicher" , F_OK) == 0 ){
-                    cout << "Saisie du nom de ficher existe déjà. Recommencer." << endl;
+                    cout << "Saisie du nom de fichier existe déjà. Recommencer." << endl;
                     continue;
                 }*/
-                
-                cout<<"Entrez le type de sauvegarde :"<<endl;
-                cout<<"1. Sans critère de sélection"<<endl;
-                cout<<"2. Selon le type des trajets"<<endl;
-                cout<<"3. Selon la ville de départ et / ou la ville d'arrivée"<<endl;
-                cout<<"4. Selon une sélection de trajets"<<endl;
+
+                cout <<"Entrez le type de sauvegarde :" << endl;
+                cout <<"\t1: Sans critère de sélection" << endl;
+                cout <<"\t2: Selon le type des trajets" << endl;
+                cout <<"\t3: Selon la ville de départ et / ou la ville d'arrivée" << endl;
+                cout <<"\t4: Selon une sélection de trajets" << endl;
+                cout <<"\t5: Retour au menu principal" << endl;
                 cin>>choix;
+
                 switch(choix){
                     case '1':
-                    //catalogue.Charge(nomFicher,SANS);
-                    break;
+                        catalogue.Sauvegarde(nomFichier,SANS);
+                        break;
                     case '2':
-                    //catalogue.Charge(nomFicher,TYPE);
-                    break;
+                        catalogue.Sauvegarde(nomFichier,TYPE);
+                        break;
                     case '3':
-                    //catalogue.Charge(nomFicher,VILLE);
-                    break;
+                        catalogue.Sauvegarde(nomFichier,VILLE);
+                        break;
                     case '4':
-                    //catalogue.Charge(nomFicher,TRAJETS);
-                    break;
+                        catalogue.Sauvegarde(nomFichier,TRAJETS);
+                        break;
+                    case '5' :
+                        break;
                     default:
-                    cout << "Saisie du choix incorrect. Recommencer." << endl;
-                    continue;
+                        cout << "Saisie du choix incorrect. Recommencer." << endl;
+                        continue;
                 }
                 break;
+
             }
             default:
             {

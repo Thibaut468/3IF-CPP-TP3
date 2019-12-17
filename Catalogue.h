@@ -16,6 +16,7 @@
 #include "TrajetSimple.h"
 #include "TrajetCompose.h"
 #include <fstream>
+#include <string>
 
 //------------------------------------------------------------- Constantes
 
@@ -39,6 +40,19 @@ class Catalogue
 public:
 //----------------------------------------------------- Méthodes publiques
     // type Méthode ( liste des paramètres );
+    // Mode d'emploi :
+    //
+    // Contrat :
+    //
+
+    int Sauvegarde(string cheminAcces, CritereSelection critere);
+    // Mode d'emploi :
+    //
+    //
+    // Contrat :
+    //
+
+    int Charge(string cheminAcces,CritereSelection critere);
     // Mode d'emploi :
     //
     // Contrat :
@@ -77,11 +91,6 @@ public:
     // Contrat :
     //  Les noms des villes doivent correspondre exactement à ceux déjà rentrés, au caractère et à la majuscule près
 
-    int Charge(string cheminAcces,CritereSelection critere);
-
-    Trajet* construitTrajetAvecLecture(ifstream & fichier);
-    // Contrat : il faut que le fichier soit correctement ouvert (vérification en amont)
-
 //------------------------------------------------- Surcharge d'opérateurs
 
     friend ostream & operator << (ostream & flux, const Catalogue & unCatalogue);
@@ -105,6 +114,20 @@ public:
 
 protected:
 //----------------------------------------------------- Méthodes protégées
+
+    string & createBuffer(string & buffer, Trajet* traj);
+    // Mode d'emploi :
+    // Affiche un message dans la console demandant à l'utilisateur de saisir une ville
+    // d'arrivée, et renvoie la saisie de l'utilisateur à l'aide d'un pointeur
+    // Contrat :
+    //
+
+    Trajet* construitTrajetAvecLecture(ifstream & fichier);
+    // Mode d'emploi :
+    //
+    // Contrat :
+    // Il faut que le fichier soit correctement ouvert (vérification en amont)
+
     char * askVilleArrivee();
     // Mode d'emploi :
     // Affiche un message dans la console demandant à l'utilisateur de saisir une ville

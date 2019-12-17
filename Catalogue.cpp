@@ -14,8 +14,8 @@
 using namespace std;
 #include <iostream>
 #include <cstring>
-#include <fstream>
 #include <sstream>
+#include <string>
 
 //------------------------------------------------------ Include personnel
 #include "Catalogue.h"
@@ -29,6 +29,184 @@ static const int TAILLE_ENTREE_MOYEN_TRANSPORT = 20;
 //----------------------------------------------------------------- PUBLIC
 
 //----------------------------------------------------- Méthodes publiques
+
+int Catalogue::Sauvegarde(string cheminAcces, CritereSelection critere)
+// Algorithme :
+//
+//
+{
+    ofstream fichierDeSortie(cheminAcces);
+
+    string buffer;
+
+    cout << "Sauvegarde" << endl;
+
+    if(!fichierDeSortie)
+    {
+        cerr << "Une erreur s'est produite lors de l'ouverture du fichier. Abandon" << endl;
+        return -1;
+    }
+
+    cout << "Fichier bien ouvert" << endl;
+
+    switch(critere)
+    {
+        case SANS : //Sauvegarde de tout le catalogue
+
+            cout << "Selection sans critere" << endl;
+            for(int i = 0; i<listeTraj.GetNbTrajets(); i++)
+            {
+                createBuffer(buffer,listeTraj.GetListe()[i]);
+                cout << buffer << endl;
+                if(!buffer.empty())
+                {
+                    if(fichierDeSortie)
+                    {
+                        fichierDeSortie << buffer;
+                    }
+                    else
+                    {
+                        cerr << "Une erreur s'est produite lors de l'écriture. Abandon" << endl;
+                        return -1;
+                    }
+                }
+            }
+
+            break;
+
+        case TYPE :
+
+            char choix[2];
+            cout << "Sélection du type de trajets souhaité lors de la sauvegarde\r\nTS\r\nTC" << endl;
+            cin.getline(choix, 2);
+            if(!(strcmp(choix,"TC")==0 || strcmp(choix,"TS")==0))
+            {
+                cerr << "Erreur lors de la sélection, ce type n'existe pas. Abandon." << endl;
+                return -1;
+            }
+
+            for(int i = 0; i<listeTraj.GetNbTrajets(); i++)
+            {
+                if(listeTraj.GetListe()[i]->GetType()==choix) {
+                    createBuffer(buffer, listeTraj.GetListe()[i]);
+                    if (!buffer.empty()) {
+                        if (fichierDeSortie) {
+                            fichierDeSortie << buffer;
+                        } else {
+                            cerr << "Une erreur s'est produite lors de l'écriture. Abandon" << endl;
+                            return -1;
+                        }
+                    }
+                }
+            }
+
+            break;
+
+        case VILLE :
+            break;
+
+        case TRAJETS :
+            break;
+
+        default:
+            cerr << "Une erreur s'est produite dans l'appel d'un critère de sélection" << endl;
+            return -1;
+    }
+
+    cout << endl << "---- Trajet(s) correctement sauvegardée(s)---- " << endl;
+
+    return 0;
+
+} //----- Fin de Sauvegarde
+
+int Catalogue::Charge(string cheminAcces,CritereSelection critere)
+// Algorithme :
+//
+{
+    int nbTrajetDansTC;
+    int borneInf;
+    int borneSup;
+    char typeTrajet[15];
+    Trajet* ptr_trajet;
+    ifstream fichier(cheminAcces);
+    int i;
+    // on vérifie que le fichier a bien été ouvert
+    if(fichier.is_open())
+    {
+        switch(critere)
+        {
+            case SANS: // charge tous les trajets
+                while(fichier)
+                {
+                    ptr_trajet = construitTrajetAvecLecture(fichier);
+                    if(ptr_trajet!=nullptr)
+                    {
+                        listeTraj.AddTrajet(ptr_trajet);
+                    }
+                }
+                break;
+
+            case TYPE: // charge uniquement les TS ou les TC
+                cout<<"Sélection des trajets\r\n\tSimples\r\n\tComposes"<<endl;
+                cin>>typeTrajet;
+                //on veut les trajets simples
+                if(strcmp(typeTrajet,"Simples")==0)
+                {
+                    while(fichier) // tant que l'on n'a pas atteint la fin
+                    {
+                        ptr_trajet = construitTrajetAvecLecture(fichier);
+                        if(ptr_trajet!=nullptr && ptr_trajet->GetType()=="TS") // c'est bien un trajet simple
+                        {
+                            listeTraj.AddTrajet(ptr_trajet);
+                        }
+                        else if(ptr_trajet!=nullptr) // c'est un trajet compose
+                        {
+                            delete ptr_trajet;
+                        }
+                    }
+                }
+                    //on veut les trajets composes
+                else if(strcmp(typeTrajet,"Composes")==0)
+                {
+                    while(fichier)
+                    {
+                        ptr_trajet = construitTrajetAvecLecture(fichier);
+                        if(ptr_trajet!=nullptr && ptr_trajet->GetType()=="TC") // c'est bien un trajet compose
+                        {
+                            listeTraj.AddTrajet(ptr_trajet);
+                        }
+                        else if(ptr_trajet!=nullptr)// c'est un trajet simple
+                        {
+                            delete ptr_trajet;
+                        }
+                    }
+                }
+                else
+                {
+                    cerr<<"Saisie non valide"<<endl;
+                }
+                break;
+
+            case VILLE: // charge en fonction de la ville de départ et/ou d'arrivée
+
+                break;
+
+            case TRAJETS: // charge en fonction du numero de la ligne
+
+                break;
+
+        }
+    }
+    else
+    {
+        cerr<<"Une erreur s'est produite lors de l'ouverture du fichier"<<endl;
+        return -1;
+    }
+
+    cout << endl << "---- Trajet(s) correctement ajouté(s)---- " << endl;
+    return 0;
+
+} //----- Fin de Charge
 
 void Catalogue::AddTrajetSimple()
 // Algorithme :
@@ -195,166 +373,6 @@ void Catalogue::RechercheComplexe()
     delete [] vArrivee;
 } //----- Fin de RechercheComplexe
 
-Trajet* Catalogue::construitTrajetAvecLecture(ifstream & fichier)
-// Algorithme :
-//
-{
-  char typeTrajet[15];
-  char villeDepart[TAILLE_ENTREE_VILLE];
-  char villeArrivee[TAILLE_ENTREE_VILLE];
-  char villeDepartIniTC[TAILLE_ENTREE_VILLE];
-  char villeArriveeFinTC[TAILLE_ENTREE_VILLE];
-  char moyenTransport[TAILLE_ENTREE_MOYEN_TRANSPORT];
-  char lectureNbTrajet[5];
-  int nbTrajetDansTC;
-  Trajet * ptr_trajet;
-  int i;
-
-  //lecture du type
-  fichier.getline(typeTrajet,10,'|');
-  if(!fichier) // on a atteint la fin du fichier
-  {
-    return nullptr;
-  }
-  if(strcmp(typeTrajet,"TS")==0) // trajet simple
-  {
-    fichier.getline(villeDepart,TAILLE_ENTREE_VILLE,'|');
-    fichier.getline(villeArrivee,TAILLE_ENTREE_VILLE,'|');
-    fichier.getline(moyenTransport,TAILLE_ENTREE_MOYEN_TRANSPORT);
-    ptr_trajet = new TrajetSimple(villeDepart,villeArrivee,moyenTransport);
-    return ptr_trajet;
-  }
-  else// trajet compose
-  {
-    fichier.getline(villeDepartIniTC,TAILLE_ENTREE_VILLE,'|');
-    fichier.getline(villeArriveeFinTC,TAILLE_ENTREE_VILLE,'|');
-    fichier.getline(lectureNbTrajet,5,'|');
-    //on convertit le nb trajet lu en int
-    stringstream s(lectureNbTrajet);
-    s>>nbTrajetDansTC;
-    ListeTrajets * listeTrajetTC = new ListeTrajets(nbTrajetDansTC);
-
-    for(i=0;i<nbTrajetDansTC;i++)
-    {
-      if(i==0)
-      {
-        strcpy(villeDepart,villeDepartIniTC);
-      }
-      else
-      {
-        strcpy(villeDepart,villeArrivee);
-      }
-
-      if(i==nbTrajetDansTC-1) // cas particulier car pour le dernier trajet on a juste besoin de relever le moyen de transport (et il n'y a pas de | à la fin)
-      {
-        strcpy(villeArrivee,villeArriveeFinTC);
-        fichier.getline(moyenTransport,TAILLE_ENTREE_MOYEN_TRANSPORT);
-      }
-      else
-      {
-        fichier.getline(villeArrivee,TAILLE_ENTREE_VILLE,'|');
-        fichier.getline(moyenTransport,TAILLE_ENTREE_MOYEN_TRANSPORT,'|');
-      }
-
-      ptr_trajet = new TrajetSimple(villeDepart,villeArrivee,moyenTransport);
-      listeTrajetTC->AddTrajet(ptr_trajet);
-    }
-    ptr_trajet = new TrajetCompose(villeDepartIniTC,villeArriveeFinTC,listeTrajetTC);
-    return ptr_trajet;
-
-  }
-
-} //----- Fin de RechercheComplexe
-
-int Catalogue::Charge(string cheminAcces,CritereSelection critere)
-// Algorithme :
-//
-{
-  int nbTrajetDansTC;
-  int borneInf;
-  int borneSup;
-  char typeTrajet[15];
-  Trajet* ptr_trajet;
-  ifstream fichier(cheminAcces);
-  int i;
-  // on vérifie que le fichier a bien été ouvert
-  if(fichier.is_open())
-  {
-    switch(critere)
-    {
-      case SANS: // charge tous les trajets
-        while(fichier)
-        {
-          ptr_trajet = construitTrajetAvecLecture(fichier);
-          if(ptr_trajet!=nullptr)
-          {
-            listeTraj.AddTrajet(ptr_trajet);
-          }
-        }
-        break;
-
-      case TYPE: // charge uniquement les TS ou les TC
-        cout<<"Sélection des trajets\r\n\tSimples\r\n\tComposes"<<endl;
-        cin>>typeTrajet;
-        //on veut les trajets simples
-        if(strcmp(typeTrajet,"Simples")==0)
-        {
-          while(fichier) // tant que l'on n'a pas atteint la fin
-          {
-            ptr_trajet = construitTrajetAvecLecture(fichier);
-            if(ptr_trajet!=nullptr && ptr_trajet->GetType()=="TS") // c'est bien un trajet simple
-            {
-              listeTraj.AddTrajet(ptr_trajet);
-            }
-            else if(ptr_trajet!=nullptr) // c'est un trajet compose
-            {
-              delete ptr_trajet;
-            }
-          }
-        }
-        //on veut les trajets composes
-        else if(strcmp(typeTrajet,"Composes")==0)
-        {
-          while(fichier)
-          {
-            ptr_trajet = construitTrajetAvecLecture(fichier);
-            if(ptr_trajet!=nullptr && ptr_trajet->GetType()=="TC") // c'est bien un trajet compose
-            {
-              listeTraj.AddTrajet(ptr_trajet);
-            }
-            else if(ptr_trajet!=nullptr)// c'est un trajet simple
-            {
-              delete ptr_trajet;
-            }
-          }
-        }
-        else
-        {
-          cerr<<"Saisie non valide"<<endl;
-        }
-        break;
-
-      case VILLE: // charge en fonction de la ville de départ et/ou d'arrivée
-
-        break;
-
-      case TRAJETS: // charge en fonction du numero de la ligne
-
-        break;
-
-    }
-  }
-  else
-  {
-    cerr<<"Une erreur s'est produite lors de l'ouverture du fichier"<<endl;
-    return -1;
-  }
-
-  cout<<"---- Trajet(s) correctement ajouté(s)---- "<<endl;
-  return 0;
-
-} //----- Fin de Sauvegarde
-
 //------------------------------------------------- Surcharge d'opérateurs
 
 ostream & operator << (ostream & flux, const Catalogue & unCatalogue)
@@ -414,6 +432,149 @@ Catalogue::~Catalogue ( )
 
 
 //------------------------------------------------------------------ PRIVE
+
+//----------------------------------------------------- Méthodes protégées
+
+string & Catalogue::createBuffer(string & buffer, Trajet* traj)
+// Algorithme :
+//
+{
+    buffer.clear();
+
+    buffer+=(traj->GetType()+"|"+traj->GetVilleDepart()+"|"+traj->GetVilleArrivee()+"|");
+
+    if(traj->GetType()=="TS")
+    {
+        TrajetSimple* ts = dynamic_cast<TrajetSimple*>(traj);
+        if(ts == nullptr)
+        {
+            cerr << "Erreur dynamic_cast lors de la sauvegarde" << endl;
+            buffer.clear();
+            return buffer;
+        }
+        buffer+=ts->GetMoyenTransport();
+    }
+    else //TC
+    {
+        TrajetCompose* tc = dynamic_cast<TrajetCompose*>(traj);
+        if(tc == nullptr)
+        {
+            cerr << "Erreur dynamic_cast lors de la sauvegarde" << endl;
+            buffer.clear();
+            return buffer;
+        }
+
+        int nbTrajets = tc->GetNbTrajets();
+
+        buffer+=to_string(nbTrajets)+"|";
+
+        ListeTrajets * etapes = tc->GetEtapes();
+
+        for(int i = 0; i<(etapes->GetNbTrajets()-1);i++)
+        {
+            TrajetSimple * tmp = dynamic_cast<TrajetSimple*> (etapes->GetListe()[i]);
+
+            if(tmp == nullptr)
+            {
+                cerr << "Erreur dynamic_cast lors de la sauvegarde" << endl;
+                buffer.clear();
+                return buffer;
+            }
+
+            buffer+=tmp->GetVilleArrivee();
+            buffer+="|";
+            buffer+=tmp->GetMoyenTransport();
+            buffer+="|";
+        }
+
+        TrajetSimple * tmp = dynamic_cast<TrajetSimple*>(etapes->GetListe()[etapes->GetNbTrajets()-1]);
+
+        if(tmp == nullptr)
+        {
+            cerr << "Erreur dynamic_cast lors de la sauvegarde" << endl;
+            buffer.clear();
+            return buffer;
+        }
+
+        buffer+= tmp->GetMoyenTransport();
+
+    }
+
+    buffer+="\n";
+
+    return buffer;
+} // ------ Fin de createBuffer
+
+Trajet* Catalogue::construitTrajetAvecLecture(ifstream & fichier)
+// Algorithme :
+//
+{
+    char typeTrajet[15];
+    char villeDepart[TAILLE_ENTREE_VILLE];
+    char villeArrivee[TAILLE_ENTREE_VILLE];
+    char villeDepartIniTC[TAILLE_ENTREE_VILLE];
+    char villeArriveeFinTC[TAILLE_ENTREE_VILLE];
+    char moyenTransport[TAILLE_ENTREE_MOYEN_TRANSPORT];
+    char lectureNbTrajet[5];
+    int nbTrajetDansTC;
+    Trajet * ptr_trajet;
+    int i;
+
+    //lecture du type
+    fichier.getline(typeTrajet,10,'|');
+    if(!fichier) // on a atteint la fin du fichier
+    {
+        return nullptr;
+    }
+    if(strcmp(typeTrajet,"TS")==0) // trajet simple
+    {
+        fichier.getline(villeDepart,TAILLE_ENTREE_VILLE,'|');
+        fichier.getline(villeArrivee,TAILLE_ENTREE_VILLE,'|');
+        fichier.getline(moyenTransport,TAILLE_ENTREE_MOYEN_TRANSPORT);
+        ptr_trajet = new TrajetSimple(villeDepart,villeArrivee,moyenTransport);
+        return ptr_trajet;
+    }
+    else// trajet compose
+    {
+        fichier.getline(villeDepartIniTC,TAILLE_ENTREE_VILLE,'|');
+        fichier.getline(villeArriveeFinTC,TAILLE_ENTREE_VILLE,'|');
+        fichier.getline(lectureNbTrajet,5,'|');
+        //on convertit le nb trajet lu en int
+        stringstream s(lectureNbTrajet);
+        s>>nbTrajetDansTC;
+        ListeTrajets * listeTrajetTC = new ListeTrajets(nbTrajetDansTC);
+
+        for(i=0;i<nbTrajetDansTC;i++)
+        {
+            if(i==0)
+            {
+                strcpy(villeDepart,villeDepartIniTC);
+            }
+            else
+            {
+                strcpy(villeDepart,villeArrivee);
+            }
+
+            if(i==nbTrajetDansTC-1) // cas particulier car pour le dernier trajet on a juste besoin de relever le moyen de transport (et il n'y a pas de | à la fin)
+            {
+                strcpy(villeArrivee,villeArriveeFinTC);
+                fichier.getline(moyenTransport,TAILLE_ENTREE_MOYEN_TRANSPORT);
+            }
+            else
+            {
+                fichier.getline(villeArrivee,TAILLE_ENTREE_VILLE,'|');
+                fichier.getline(moyenTransport,TAILLE_ENTREE_MOYEN_TRANSPORT,'|');
+            }
+
+            ptr_trajet = new TrajetSimple(villeDepart,villeArrivee,moyenTransport);
+            listeTrajetTC->AddTrajet(ptr_trajet);
+        }
+        ptr_trajet = new TrajetCompose(villeDepartIniTC,villeArriveeFinTC,listeTrajetTC);
+        return ptr_trajet;
+
+    }
+
+} //----- Fin de construitTrajetAvecLecture
 
 char * Catalogue::askVilleArrivee()
 // Algorithme :
@@ -498,6 +659,3 @@ int Catalogue::rechercheEtape(const char * departTrajet, const char * arriveeFin
 
     return compteurTrajets;
 }// Fin de RechercheEtape
-
-
-//----------------------------------------------------- Méthodes protégées
