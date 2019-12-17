@@ -42,27 +42,27 @@ int main()
         cout << "\t5: Recherche complexe" << endl;
         cout << "\t0: Quitter l'application Mapper" << endl;
 
-        int choix;
+        char choix;
         cin>>choix;
         cin.ignore();
 
         switch (choix) {
-            case 0:
+            case'0':
                 end=true;
                 break;
-            case 1:
+            case '1':
                 catalogue.AddTrajetSimple();
                 break;
-            case 2:
+            case '2':
                 catalogue.AddTrajetCompose();
                 break;
-            case 3:
+            case '3':
                 cout << catalogue;
                 break;
-            case 4:
+            case '4':
                 catalogue.RechercheSimple();
                 break;
-            case 5:
+            case '5':
                 catalogue.RechercheComplexe();
                 break;
             default:
