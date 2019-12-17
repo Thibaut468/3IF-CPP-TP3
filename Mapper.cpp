@@ -68,14 +68,15 @@ int main()
                 catalogue.RechercheComplexe();
                 break;
             case '6':
-                cout<<"Entrez le nom de ficher pour le chargement:"<<endl;
+                cout<<"Entrez le nom de ficher(avec l'extension) pour le chargement:"<<endl;
                 string nomFicher;
                 cin>>nomFicher>>endl;
-                //si le nonFicher existe
-                /*if(std::filesystem::exists(nomFicher)){
-                    cout << "Saisie du choix incorrect. Recommencer." << endl;
-                    continue;
-                }
+                //si le nonFicher existe ;  04 l'acces read ,oui -> 0 , n'existe pas ou pas de droit de read -> -1
+                /*    if(_access( "crt_ACCESS.C", 04) == -1 ){
+                        cout << "Saisie du ficher sans droit de lecture. Recommencer." << endl;
+                        choix = '6';
+                        continue;
+                    }
                 */
                 cout<<"Entrez le type de chargement :"<<endl;
                 cout<<"1. Sans critère de sélection"<<endl;
@@ -103,10 +104,16 @@ int main()
 
                 break;
             case '7':
-                cout<<"Entrez le nom de ficher pour la sauvegarde:"<<endl;
+                cout<<"Entrez le nom de ficher(avec l'extension) pour la sauvegarde:"<<endl;
                 string nomFicher;
                 cin>>nomFicher>>endl;
-
+                //si le nonFicher existe ;  00 exisitance , oui -> 0 , non -> -1
+                /*if(_access( "crt_ACCESS.C", 00) == 0 ){
+                    cout << "Saisie du nom de ficher existe déjà. Recommencer." << endl;
+                    choix = '7';
+                    continue;
+                }
+                */
                 cout<<"Entrez le type de sauvegarde :"<<endl;
                 cout<<"1. Sans critère de sélection"<<endl;
                 cout<<"2. Selon le type des trajets"<<endl;
