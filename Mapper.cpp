@@ -40,6 +40,8 @@ int main()
         cout << "\t3: Afficher le catalogue" << endl;
         cout << "\t4: Recherche simple" << endl;
         cout << "\t5: Recherche complexe" << endl;
+        cout << "\t6: Chargement d'un catalogue de trajets" << endl;
+        cout << "\t7: sauvegarde du catalogue courant" << endl;
         cout << "\t0: Quitter l'application Mapper" << endl;
 
         char choix;
@@ -64,6 +66,71 @@ int main()
                 break;
             case '5':
                 catalogue.RechercheComplexe();
+                break;
+            case '6':
+                cout<<"Entrez le nom de ficher pour le chargement:"<<endl;
+                string nomFicher;
+                cin>>nomFicher>>endl;
+                //si le nonFicher existe
+                /*if(std::filesystem::exists(nomFicher)){
+                    cout << "Saisie du choix incorrect. Recommencer." << endl;
+                    continue;
+                }
+                */
+                cout<<"Entrez le type de chargement :"<<endl;
+                cout<<"1. Sans critère de sélection"<<endl;
+                cout<<"2. Selon le type des trajets"<<endl;
+                cout<<"3. Selon la ville de départ et / ou la ville d'arrivée"<<endl;
+                cout<<"4. Selon une sélection de trajets"<<endl;
+                cin>>choix;
+                switch(choix){
+                    case '1':
+                    catalogue.Sauvegarde(nomFicher,catalogue::SANS); 
+                    break;
+                    case '2':
+                    catalogue.Sauvegarde(nomFicher,catalogue::TYPE); 
+                    break;
+                    case '3':
+                    catalogue.Sauvegarde(nomFicher,catalogue::VILLE); 
+                    break;
+                    case '4':
+                    catalogue.Sauvegarde(nomFicher,catalogue::TRAJETS); 
+                    break;
+                    default:
+                    cout << "Saisie du choix incorrect. Recommencer." << endl;
+                    continue;
+                }
+
+                break;
+            case '7':
+                cout<<"Entrez le nom de ficher pour la sauvegarde:"<<endl;
+                string nomFicher;
+                cin>>nomFicher>>endl;
+
+                cout<<"Entrez le type de sauvegarde :"<<endl;
+                cout<<"1. Sans critère de sélection"<<endl;
+                cout<<"2. Selon le type des trajets"<<endl;
+                cout<<"3. Selon la ville de départ et / ou la ville d'arrivée"<<endl;
+                cout<<"4. Selon une sélection de trajets"<<endl;
+                cin>>choix;
+                switch(choix){
+                    case '1':
+                    catalogue.Charge(nomFicher,catalogue::SANS); 
+                    break;
+                    case '2':
+                    catalogue.Charge(nomFicher,catalogue::TYPE); 
+                    break;
+                    case '3':
+                    catalogue.Charge(nomFicher,catalogue::VILLE); 
+                    break;
+                    case '4':
+                    catalogue.Charge(nomFicher,catalogue::TRAJETS); 
+                    break;
+                    default:
+                    cout << "Saisie du choix incorrect. Recommencer." << endl;
+                    continue;
+                }
+
                 break;
             default:
                 cout << "Saisie du choix incorrect. Recommencer." << endl;
