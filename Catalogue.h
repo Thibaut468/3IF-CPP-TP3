@@ -15,6 +15,7 @@
 #include "Trajet.h"
 #include "TrajetSimple.h"
 #include "TrajetCompose.h"
+#include <fstream>
 
 //------------------------------------------------------------- Constantes
 
@@ -75,6 +76,11 @@ public:
     // Ce voyage peut alors se composer de plusieurs trajets qui s'enchainent.
     // Contrat :
     //  Les noms des villes doivent correspondre exactement à ceux déjà rentrés, au caractère et à la majuscule près
+
+    int Charge(char* cheminAcces,CritereSelection critere);
+
+    Trajet* construitTrajetAvecLecture(ifstream & fichier);
+    // Contrat : il faut que le fichier soit correctement ouvert (vérification en amont)
 
 //------------------------------------------------- Surcharge d'opérateurs
 

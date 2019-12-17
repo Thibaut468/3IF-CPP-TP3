@@ -14,9 +14,12 @@
 using namespace std;
 #include <iostream>
 #include <cstring>
+#include <fstream>
+#include <sstream>
 
 //------------------------------------------------------ Include personnel
 #include "Catalogue.h"
+#include "ListeTrajets.h"
 
 //------------------------------------------------------------- Constantes
 
@@ -192,7 +195,159 @@ void Catalogue::RechercheComplexe()
     delete [] vArrivee;
 } //----- Fin de RechercheComplexe
 
+Trajet* construitTrajetAvecLecture(ifstream & fichier)
+// Algorithme :
+//
+{
+  char typeTrajet[15];
+  char villeDepart[TAILLE_ENTREE_VILLE];
+  char villeArrivee[TAILLE_ENTREE_VILLE];
+  char villeDepartIniTC[TAILLE_ENTREE_VILLE];
+  char villeArriveeFinTC[TAILLE_ENTREE_VILLE];
+  char moyenTransport[TAILLE_ENTREE_MOYEN_TRANSPORT];
+  char lectureNbTrajet[5];
+  int nbTrajetDansTC;
+  Trajet * ptr_trajet;
+  int i;
 
+  //lecture du type
+  fichier.getline(typeTrajet,10,'|');
+  if(strcmp(typeTrajet,"TS")==0) // trajet simple
+  {
+    fichier.getline(villeDepart,TAILLE_ENTREE_VILLE,'|');
+    fichier.getline(villeArrivee,TAILLE_ENTREE_VILLE,'|');
+    fichier.getline(moyenTransport,TAILLE_ENTREE_MOYEN_TRANSPORT,'|');
+    ptr_trajet = new TrajetSimple(villeDepart,villeArrivee,moyenTransport);
+    return ptr_trajet;
+  }
+  else // trajet compose
+  {
+    fichier.getline(villeDepartIniTC,TAILLE_ENTREE_VILLE,'|');
+    fichier.getline(villeArriveeFinTC,TAILLE_ENTREE_VILLE,'|');
+    fichier.getline(lectureNbTrajet,5,'|');
+    //on convertit le nb trajet lu en int
+    stringstream s(lectureNbTrajet);
+    s>>nbTrajetDansTC;
+    ListeTrajets * listeTrajetTC = new ListeTrajets(nbTrajetDansTC);
+
+    for(i=0;i<nbTrajetDansTC;i++)
+    {
+      if(i==0)
+      {
+        strcpy(villeDepart,villeDepartIniTC);
+      }
+      else
+      {
+        strcpy(villeDepart,villeArrivee);
+      }
+
+      if(i==nbTrajetDansTC-1) // cas particulier car pour le dernier trajet on a juste besoin de relever le moyen de transport (et il n'y a pas de | à la fin)
+      {
+        strcpy(villeArrivee,villeArriveeFinTC);
+        fichier.getline(moyenTransport,TAILLE_ENTREE_MOYEN_TRANSPORT,'\n');
+      }
+      else
+      {
+        fichier.getline(villeArrivee,TAILLE_ENTREE_VILLE,'|');
+        fichier.getline(moyenTransport,TAILLE_ENTREE_MOYEN_TRANSPORT,'|');
+      }
+
+      ptr_trajet = new TrajetSimple(villeDepart,villeArrivee,moyenTransport);
+      listeTrajetTC->AddTrajet(ptr_trajet);
+    }
+    ptr_trajet = new TrajetCompose(villeDepartIniTC,villeArriveeFinTC,listeTrajetTC);
+    return ptr_trajet;
+
+  }
+
+} //----- Fin de RechercheComplexe
+
+int Catalogue::Charge(char* cheminAcces,CritereSelection critere)
+// Algorithme :
+//
+{
+  int nbTrajetDansTC;
+  int borneInf;
+  int borneSup;
+  char typeTrajet[15];
+  Trajet* ptr_trajet;
+  ifstream fichier(cheminAcces);
+  int i;
+  // on vérifie que le fichier a bien été ouvert
+  if(fichier.is_open())
+  {
+    switch(critere)
+    {
+      case SANS: // charge tous les trajets
+        while(fichier)
+        {
+          ptr_trajet = construitTrajetAvecLecture(fichier);
+          listeTraj.AddTrajet(ptr_trajet);
+        }
+        break;
+
+      case TYPE: // charge uniquement les TS ou les TC
+        //gerer erreur de saisie
+        cout<<"Sélection des trajets\r\n\tSimples\r\n\tComposes"<<endl;
+        cin.getline(typeTrajet,15);
+        //on veut les trajets simples
+        if(strcmp(typeTrajet,"Simples")==0)
+        {
+          while(fichier) // tant que l'on n'a pas atteint la fin
+          {
+            ptr_trajet = construitTrajetAvecLecture(fichier);
+            if(ptr_trajet->GetType()=="TS") // c'est bien un trajet simple
+            {
+              listeTraj.AddTrajet(ptr_trajet);
+            }
+            else // c'est un trajet compose
+            {
+              delete ptr_trajet;
+            }
+          }
+        }
+        //on veut les trajets composes
+        else if(strcmp(typeTrajet,"Composes")==0)
+        {
+          while(fichier)
+          {
+            ptr_trajet = construitTrajetAvecLecture(fichier);
+            if(ptr_trajet->GetType()=="TC") // c'est bien un trajet compose
+            {
+              listeTraj.AddTrajet(ptr_trajet);
+            }
+            else // c'est un trajet simple
+            {
+              delete ptr_trajet;
+            }
+          }
+        }
+        else
+        {
+          cerr<<"Saisie non valide"<<endl;
+        }
+        break;
+
+      case VILLE: // charge en fonction de la ville de départ et/ou d'arrivée
+
+        break;
+
+      case TRAJETS: // charge en fonction du numero de la ligne
+
+        break;
+
+    }
+  }
+  else
+  {
+    cerr<<"Une erreur s'est produite lors de l'ouverture du fichier"<<endl;
+    return -1;
+  }
+
+  cout<<"---- Trajet(s) correctement ajouté(s)---- "<<endl;
+  return 0;
+
+} //----- Fin de Sauvegarde
 
 //------------------------------------------------- Surcharge d'opérateurs
 
