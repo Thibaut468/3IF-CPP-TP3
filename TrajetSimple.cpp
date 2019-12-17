@@ -37,6 +37,16 @@ void TrajetSimple::Affichage () const
 
 } //----- Fin de Affichage
 
+char* TrajetSimple::GetMoyenTransport() const
+{
+    return moyenTransport;
+} //----- Fin de GetMoyenTransport
+
+string TrajetSimple::GetType() const
+{
+    return "TS";
+} //------ Fin de GetType
+
 
 //-------------------------------------------- Constructeurs - destructeur
 TrajetSimple::TrajetSimple(const TrajetSimple &unTrajetSimple) : Trajet(unTrajetSimple.villeDepart,unTrajetSimple.villeArrivee)

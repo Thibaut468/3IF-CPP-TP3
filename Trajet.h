@@ -54,6 +54,13 @@ public:
     // Contrat :
     //
 
+    virtual string GetType() const = 0;
+    // Mode d'emploi :
+    // Un getteur qui permet d'obtenir le type de trajet (simple ou composée)
+    // C'est une méthode virtuelle pure devant être redéfinie chez les descendants
+    // Contrat :
+    //
+
     //-------------------------------------------- Destructeur
 
     virtual ~Trajet ( );

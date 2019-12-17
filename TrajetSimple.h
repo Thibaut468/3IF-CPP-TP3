@@ -41,6 +41,18 @@ public:
     // Contrat :
     //
 
+    char* GetMoyenTransport() const;
+    // Mode d'emploi :
+    // Un getteur qui permet d'obtenir l'attribut moyen de transport
+    // Contrat :
+    //
+
+    virtual string GetType() const;
+    // Mode d'emploi :
+    // Un getteur qui permet d'obtenir le type de trajet
+    // Contrat :
+    //
+
 //-------------------------------------------- Constructeurs - destructeur
     TrajetSimple (const TrajetSimple & unTrajetSimple);
     // Mode d'emploi :

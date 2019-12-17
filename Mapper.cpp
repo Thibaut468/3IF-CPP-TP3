@@ -70,8 +70,8 @@ int main()
             case '6':
             {
                 cout<<"Entrez le nom de ficher(avec l'extension) pour le chargement:"<<endl;
-                string nomFicher;
-                cin>>nomFicher;
+                string nomFichier;
+                cin>>nomFichier;
                 //si le nonFicher existe ;  R_OK l'acces read ,oui -> 0 , n'existe pas ou pas de droit de read -> -1
                 /*if(access("nomFicher", R_OK) == -1 ){
                     cout << "Saisie du ficher n'existe pas ou sans droit de lecture. Recommencer." << endl;
@@ -79,23 +79,23 @@ int main()
                 }*/
                 
                 cout<<"Entrez le type de chargement :"<<endl;
-                cout<<"1. Sans critère de sélection"<<endl;
-                cout<<"2. Selon le type des trajets"<<endl;
-                cout<<"3. Selon la ville de départ et / ou la ville d'arrivée"<<endl;
-                cout<<"4. Selon une sélection de trajets"<<endl;
+                cout<<"\t1. Sans critère de sélection"<<endl;
+                cout<<"\t2. Selon le type des trajets"<<endl;
+                cout<<"\t3. Selon la ville de départ et / ou la ville d'arrivée"<<endl;
+                cout<<"\t4. Selon une sélection de trajets"<<endl;
                 cin>>choix;
                 switch(choix){
                     case '1':
-                    catalogue.Sauvegarde(nomFicher,catalogue::SANS); 
+                    catalogue.Sauvegarde(nomFichier,SANS);
                     break;
                     case '2':
-                    catalogue.Sauvegarde(nomFicher,catalogue::TYPE); 
+                    catalogue.Sauvegarde(nomFichier,TYPE);
                     break;
                     case '3':
-                    catalogue.Sauvegarde(nomFicher,catalogue::VILLE); 
+                    catalogue.Sauvegarde(nomFichier,VILLE);
                     break;
                     case '4':
-                    catalogue.Sauvegarde(nomFicher,catalogue::TRAJETS); 
+                    catalogue.Sauvegarde(nomFichier,TRAJETS);
                     break;
                     default:
                     cout << "Saisie du choix incorrect. Recommencer." << endl;
@@ -122,16 +122,16 @@ int main()
                 cin>>choix;
                 switch(choix){
                     case '1':
-                    catalogue.Charge(nomFicher,catalogue::SANS); 
+                    //catalogue.Charge(nomFicher,SANS);
                     break;
                     case '2':
-                    catalogue.Charge(nomFicher,catalogue::TYPE); 
+                    //catalogue.Charge(nomFicher,TYPE);
                     break;
                     case '3':
-                    catalogue.Charge(nomFicher,catalogue::VILLE); 
+                    //catalogue.Charge(nomFicher,VILLE);
                     break;
                     case '4':
-                    catalogue.Charge(nomFicher,catalogue::TRAJETS); 
+                    //catalogue.Charge(nomFicher,TRAJETS);
                     break;
                     default:
                     cout << "Saisie du choix incorrect. Recommencer." << endl;

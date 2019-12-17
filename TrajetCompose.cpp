@@ -42,7 +42,21 @@ void TrajetCompose::Affichage () const
     //Affichage des etapes
 } //----- Fin de Affichage
 
+int TrajetCompose::GetNbTrajets() const
+{
+    return nbTrajets;
+} //----- Fin de GetNbTrajets
 
+ListeTrajets* TrajetCompose::GetEtapes() const
+{
+    return etapes;
+} //----- Fin de GetEtapes
+
+
+string TrajetCompose::GetType() const
+{
+    return "TC";
+} //------ Fin de GetType
 
 //-------------------------------------------- Constructeurs - destructeur
 TrajetCompose::TrajetCompose(const TrajetCompose & unTrajetCompose ) : Trajet(unTrajetCompose.villeDepart,unTrajetCompose.villeArrivee)
@@ -65,7 +79,6 @@ TrajetCompose::TrajetCompose (const char* vDepart, const char* vArrivee, ListeTr
 // Constructeur de TrajetCompose. On appelle le constructeur de Trajet (classe mère) pour affecter les attributs VilleDépart et villeArrivee
 // et on affecte la valeur de liste (un pointeur vers ListeTrajet) à l'attribut "etapes". Pour obtenir le nombre de trajet, on appelle la méthode de
 //ListeTrajets nous renvoyant le nombre de trajet correspondant
-//
 {
 #ifdef MAP
     cout << "Appel au constructeur de <TrajetCompose>" << endl;

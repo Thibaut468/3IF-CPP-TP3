@@ -40,6 +40,7 @@ char* Trajet::GetVilleArrivee () const
     return villeArrivee;
 } //----- Fin de GetVilleArrivee
 
+
 //-------------------------------------------- Destructeurs
 
 Trajet::~Trajet ( )

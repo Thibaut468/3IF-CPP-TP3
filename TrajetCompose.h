@@ -42,6 +42,23 @@ public:
     // Contrat :
     //
 
+    int GetNbTrajets() const;
+    // Mode d'emploi :
+    // Un getteur qui permet d'obtenir l'attribut nbTrajets
+    // Contrat :
+    //
+
+    ListeTrajets* GetEtapes() const;
+    // Mode d'emploi :
+    // Un getteur qui permet d'obtenir l'adresse de la liste de trajets
+    // Contrat :
+    //
+
+    virtual string GetType() const;
+    // Mode d'emploi :
+    // Un getteur qui permet d'obtenir le type de trajet
+    // Contrat :
+    //
 
 //------------------------------------------------- Surcharge d'opérateurs
 
