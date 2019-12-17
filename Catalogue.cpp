@@ -212,6 +212,10 @@ Trajet* Catalogue::construitTrajetAvecLecture(ifstream & fichier)
 
   //lecture du type
   fichier.getline(typeTrajet,10,'|');
+  if(!fichier) // on a atteint la fin du fichier
+  {
+    return nullptr;
+  }
   if(strcmp(typeTrajet,"TS")==0) // trajet simple
   {
     fichier.getline(villeDepart,TAILLE_ENTREE_VILLE,'|');
@@ -220,7 +224,7 @@ Trajet* Catalogue::construitTrajetAvecLecture(ifstream & fichier)
     ptr_trajet = new TrajetSimple(villeDepart,villeArrivee,moyenTransport);
     return ptr_trajet;
   }
-  else // trajet compose
+  else// trajet compose
   {
     fichier.getline(villeDepartIniTC,TAILLE_ENTREE_VILLE,'|');
     fichier.getline(villeArriveeFinTC,TAILLE_ENTREE_VILLE,'|');
@@ -282,26 +286,27 @@ int Catalogue::Charge(string cheminAcces,CritereSelection critere)
         while(fichier)
         {
           ptr_trajet = construitTrajetAvecLecture(fichier);
-          listeTraj.AddTrajet(ptr_trajet);
-          fichier.get();
+          if(ptr_trajet!=nullptr)
+          {
+            listeTraj.AddTrajet(ptr_trajet);
+          }
         }
         break;
 
       case TYPE: // charge uniquement les TS ou les TC
-        //gerer erreur de saisie
         cout<<"Sélection des trajets\r\n\tSimples\r\n\tComposes"<<endl;
-        cin.getline(typeTrajet,15);
+        cin>>typeTrajet;
         //on veut les trajets simples
         if(strcmp(typeTrajet,"Simples")==0)
         {
           while(fichier) // tant que l'on n'a pas atteint la fin
           {
             ptr_trajet = construitTrajetAvecLecture(fichier);
-            if(ptr_trajet->GetType()=="TS") // c'est bien un trajet simple
+            if(ptr_trajet!=nullptr && ptr_trajet->GetType()=="TS") // c'est bien un trajet simple
             {
               listeTraj.AddTrajet(ptr_trajet);
             }
-            else // c'est un trajet compose
+            else if(ptr_trajet!=nullptr) // c'est un trajet compose
             {
               delete ptr_trajet;
             }
@@ -313,11 +318,11 @@ int Catalogue::Charge(string cheminAcces,CritereSelection critere)
           while(fichier)
           {
             ptr_trajet = construitTrajetAvecLecture(fichier);
-            if(ptr_trajet->GetType()=="TC") // c'est bien un trajet compose
+            if(ptr_trajet!=nullptr && ptr_trajet->GetType()=="TC") // c'est bien un trajet compose
             {
               listeTraj.AddTrajet(ptr_trajet);
             }
-            else // c'est un trajet simple
+            else if(ptr_trajet!=nullptr)// c'est un trajet simple
             {
               delete ptr_trajet;
             }
