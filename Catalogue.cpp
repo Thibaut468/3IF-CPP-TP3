@@ -216,7 +216,7 @@ Trajet* Catalogue::construitTrajetAvecLecture(ifstream & fichier)
   {
     fichier.getline(villeDepart,TAILLE_ENTREE_VILLE,'|');
     fichier.getline(villeArrivee,TAILLE_ENTREE_VILLE,'|');
-    fichier.getline(moyenTransport,TAILLE_ENTREE_MOYEN_TRANSPORT,'|');
+    fichier.getline(moyenTransport,TAILLE_ENTREE_MOYEN_TRANSPORT);
     ptr_trajet = new TrajetSimple(villeDepart,villeArrivee,moyenTransport);
     return ptr_trajet;
   }
@@ -244,7 +244,7 @@ Trajet* Catalogue::construitTrajetAvecLecture(ifstream & fichier)
       if(i==nbTrajetDansTC-1) // cas particulier car pour le dernier trajet on a juste besoin de relever le moyen de transport (et il n'y a pas de | à la fin)
       {
         strcpy(villeArrivee,villeArriveeFinTC);
-        fichier.getline(moyenTransport,TAILLE_ENTREE_MOYEN_TRANSPORT,'\n');
+        fichier.getline(moyenTransport,TAILLE_ENTREE_MOYEN_TRANSPORT);
       }
       else
       {
@@ -283,6 +283,7 @@ int Catalogue::Charge(string cheminAcces,CritereSelection critere)
         {
           ptr_trajet = construitTrajetAvecLecture(fichier);
           listeTraj.AddTrajet(ptr_trajet);
+          fichier.get();
         }
         break;
 
