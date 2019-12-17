@@ -1,0 +1,2 @@
+TS|Paris|Lyon|Bus
+TC|Lyon|Nantes|3|Paris|BUS|Marseille|Train|Avion
