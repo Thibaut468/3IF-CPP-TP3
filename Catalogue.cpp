@@ -195,7 +195,7 @@ void Catalogue::RechercheComplexe()
     delete [] vArrivee;
 } //----- Fin de RechercheComplexe
 
-Trajet* construitTrajetAvecLecture(ifstream & fichier)
+Trajet* Catalogue::construitTrajetAvecLecture(ifstream & fichier)
 // Algorithme :
 //
 {
@@ -262,7 +262,7 @@ Trajet* construitTrajetAvecLecture(ifstream & fichier)
 
 } //----- Fin de RechercheComplexe
 
-int Catalogue::Charge(char* cheminAcces,CritereSelection critere)
+int Catalogue::Charge(string cheminAcces,CritereSelection critere)
 // Algorithme :
 //
 {
