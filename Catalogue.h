@@ -20,6 +20,8 @@
 
 //------------------------------------------------------------------ Types
 
+enum CritereSelection {SANS, TYPE, VILLE, TRAJETS};
+
 //------------------------------------------------------------------------
 // Rôle de la classe <Catalogue>
 // Catalogue est la classe principale de l'application: elle possède un seul attribut qui est
