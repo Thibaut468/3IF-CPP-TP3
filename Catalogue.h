@@ -67,7 +67,7 @@ public:
 
     void AddTrajetCompose();
     // Mode d'emploi :
-    //Permet de créer un trajet composé, à partir de plusieurs trajets simples. On ajoute
+    // Permet de créer un trajet composé, à partir de plusieurs trajets simples. On ajoute
     // ensuite ce trajet à l'attribut listeTrajets.
     // On demande d'abord le nombre de sous trajet, et une ville de départ, d'arrivée et un moyen
     // de transport pour chaque sous trajet.
@@ -85,11 +85,11 @@ public:
 
     void RechercheComplexe();
     // Mode d'emploi :
-    //  pour un voyage donné, défini par une ville  de départ et d’arrivée, permet retrouver
-    //  dans la liste de trajet existante tous les parcours permettant de réaliser ce voyage.
+    // pour un voyage donné, défini par une ville  de départ et d’arrivée, permet retrouver
+    // dans la liste de trajet existante tous les parcours permettant de réaliser ce voyage.
     // Ce voyage peut alors se composer de plusieurs trajets qui s'enchainent.
     // Contrat :
-    //  Les noms des villes doivent correspondre exactement à ceux déjà rentrés, au caractère et à la majuscule près
+    // Les noms des villes doivent correspondre exactement à ceux déjà rentrés, au caractère et à la majuscule près
 
 //------------------------------------------------- Surcharge d'opérateurs
 
@@ -115,7 +115,13 @@ public:
 protected:
 //----------------------------------------------------- Méthodes protégées
 
-    string & createBuffer(string & buffer, Trajet* traj);
+    int putInFile(ostream & stream, int & counter, ostringstream & buffer);
+    // Mode d'emploi ;
+    //
+    // Contrat :
+    //
+
+    ostringstream & createBuffer(ostringstream & buffer, Trajet* traj);
     // Mode d'emploi :
     // Affiche un message dans la console demandant à l'utilisateur de saisir une ville
     // d'arrivée, et renvoie la saisie de l'utilisateur à l'aide d'un pointeur

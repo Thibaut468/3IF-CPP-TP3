@@ -13,9 +13,7 @@
 
 //-------------------------------------------------------- Include système
 #include <iostream>
-#include <cstring>
 #include <cstdlib>
-#include <unistd.h>
 using namespace std;
 
 //------------------------------------------------------ Include personnel
@@ -27,7 +25,6 @@ using namespace std;
 int main()
 {
 
-    // CREER UNE CLASSE MENU
     bool end = false;
 
     Catalogue catalogue = Catalogue();
@@ -72,11 +69,6 @@ int main()
                 cout<<"Entrez le nom de ficher (avec l'extension) pour le chargement :"<<endl;
                 string nomFichier;
                 cin>>nomFichier;
-                //si le nonFicher existe ;  R_OK l'acces read ,oui -> 0 , n'existe pas ou pas de droit de read -> -1
-                /*if(access("nomFicher", R_OK) == -1 ){
-                    cout << "Saisie du fichier n'existe pas ou sans droit de lecture. Recommencer." << endl;
-                    continue;
-                }*/
 
                 cout <<"Entrez le type de chargement :" << endl;
                 cout <<"\t1: Sans critère de sélection" << endl;
@@ -113,11 +105,6 @@ int main()
                 cout << "Entrez le nom de ficher (avec l'extension) pour la sauvegarde :" << endl;
                 string nomFichier;
                 cin >> nomFichier;
-                //si le nonFicher existe ;  F_OK exisitance , oui -> 0 , non -> -1
-                /*if(access( "nomFicher" , F_OK) == 0 ){
-                    cout << "Saisie du nom de fichier existe déjà. Recommencer." << endl;
-                    continue;
-                }*/
 
                 cout <<"Entrez le type de sauvegarde :" << endl;
                 cout <<"\t1: Sans critère de sélection" << endl;
