@@ -91,15 +91,15 @@ int Catalogue::Charge(string cheminAcces,CritereSelection critere)
 // Algorithme :
 //
 {
-    int countCharge;
+    int countCharge(0);
     char typeTrajet[15];
-    int choixCritereVille;
-    Trajet* ptr_trajet;
+    int choixCritereVille(0);
+    Trajet* ptr_trajet = nullptr;
     ifstream fichier(cheminAcces);
     char villeDepartCritereVille[TAILLE_ENTREE_VILLE];
     char villeArriveeCritereVille[TAILLE_ENTREE_VILLE];
-    int borneInfInterv;
-    int borneSupInterv;
+    int borneInfInterv(0);
+    int borneSupInterv(0);
     int countTrajet=0;
 
     // on vérifie que le fichier a bien été ouvert
