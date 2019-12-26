@@ -32,8 +32,14 @@ static const int TAILLE_ENTREE_MOYEN_TRANSPORT = 20;
 
 int Catalogue::Sauvegarde(string cheminAcces, CritereSelection critere)
 // Algorithme :
+// L'ouverture du fichier peut se faire en écriture simple (reset du fichier à son ouverture et écriture au début)
+// ou en mode "append" où l'on ne réinitialise pas le fichier, mais on écrit simplement à la suite de l'existant
 //
+// Rien de particulier ici, le gros du travail réside dans les fonctions askParameters, respectCriteria, createBuffer
+// et enfin putInFile.
 //
+// param1, param2 et param3 n'ont pas de nom explicites car ils diffèrent d'utilisation selon le critère choisi.
+// Le matching des paramètres est décrit dans l'en tête de la fonction respectCriteria dans l'interface Catalogue.h.
 {
     //ofstream fichierDeSortie(cheminAcces,fstream::app);
     ofstream fichierDeSortie(cheminAcces,fstream::out);
@@ -49,138 +55,28 @@ int Catalogue::Sauvegarde(string cheminAcces, CritereSelection critere)
 
     cout << "Fichier bien ouvert" << endl;
 
-    string choix;
-    string vDepart("");
-    string vArrivee("");
+    //Critères d'entrées du filtre
+    string param1("");
+    string param2("");
+    int param3(0);
+
+    askParameters(critere,param1,param2);
+
     int countSave(0);
-    int intervalStart(0);
-    int intervalEnd(0);
 
-    switch(critere)
+    //Passage du filtre et mise dans le fichier
+    for(int i = 0; i<listeTraj.GetNbTrajets(); i++)
     {
-        case SANS : //Sauvegarde de tout le catalogue
-
-            cout << "Selection sans critere" << endl;
-            for(int i = 0; i<listeTraj.GetNbTrajets(); i++)
+        ++param3;
+        if(respectCriteria(listeTraj.GetListe()[i],critere,param1,param2,param3))
+        {
+            createBuffer(buffer,listeTraj.GetListe()[i]);
+            if(putInFile(fichierDeSortie,countSave,buffer)==-1)
             {
-                createBuffer(buffer,listeTraj.GetListe()[i]);
-                if(putInFile(fichierDeSortie,countSave,buffer)==-1)
-                {
-                    return -1;
-                }
+                cerr << "Erreur de la sauvegarde dans le fichier." << endl;
+                return -1;
             }
-
-            break;
-
-        case TYPE :
-
-            cout << "Sélection du type de trajets souhaité lors de la sauvegarde\n\t* TS\n\t* TC" << endl;
-
-            //A AMELIORER POUR CHECK LES ERREURS DE SAISIE
-
-            cin >> choix;
-
-            for(int i = 0; i<listeTraj.GetNbTrajets(); i++)
-            {
-                if(listeTraj.GetListe()[i]->GetType()==choix) {
-                    createBuffer(buffer, listeTraj.GetListe()[i]);
-                    if(putInFile(fichierDeSortie,countSave,buffer)==-1)
-                    {
-                        return -1;
-                    }
-                }
-            }
-
-            break;
-
-        case VILLE :
-
-            cout << "Souhaitez vous sélectionner une ville de départ ? (Y/N)" << endl;
-
-            //A AMELIORER POUR CHECK LES ERREURS DE SAISIE
-
-            cin >> choix;
-
-            if(choix=="Y" || choix == "y")
-            {
-                cout << "Saisir la ville de départ :" << endl;
-                cin >> vDepart;
-            }
-
-            cout << "Souhaitez vous sélectionner une ville d'arrivée ? (Y/N)" << endl;
-
-            //A AMELIORER POUR CHECK LES ERREURS DE SAISIE
-
-            cin >> choix;
-
-            if(choix=="Y" || choix == "y")
-            {
-                cout << "Saisir la ville d'arrivée :" << endl;
-                cin >> vArrivee;
-            }
-
-            for(int i=0;i<listeTraj.GetNbTrajets();i++)
-            {
-
-                bool useable=true;
-
-                if(!vDepart.empty() && vDepart!=listeTraj.GetListe()[i]->GetVilleDepart())
-                {
-                    useable=false;
-                }
-
-                if(!vArrivee.empty() && vArrivee!=listeTraj.GetListe()[i]->GetVilleArrivee())
-                {
-                    useable=false;
-                }
-
-                if(useable)
-                {
-                    createBuffer(buffer, listeTraj.GetListe()[i]);
-                    if(putInFile(fichierDeSortie,countSave,buffer)==-1)
-                    {
-                        return -1;
-                    }
-                }
-
-            }
-
-            break;
-
-        case TRAJETS :
-
-            cout << "Saisir la borne inférieure n de l'intervalle [n,m] avec n>=1 : " << endl;
-
-            //A AMELIORER POUR CHECK LES ERREURS DE SAISIE
-
-            cin >> intervalStart;
-
-            cout << "Saisir la borne supérieure m de l'intervalle [n,m] avec m>=n : " << endl;
-
-            //A AMELIORER POUR CHECK LES ERREURS DE SAISIE
-
-            cin >> intervalEnd;
-
-            if(intervalEnd>listeTraj.GetNbTrajets())
-            {
-                cerr << "Borne supérieure trop haute, mise à la taille maximale automatique." << endl;
-                intervalEnd=listeTraj.GetNbTrajets();
-            }
-
-            for(int i=(intervalStart-1); i<intervalEnd ; i++)
-            {
-                createBuffer(buffer, listeTraj.GetListe()[i]);
-                if(putInFile(fichierDeSortie,countSave,buffer)==-1)
-                {
-                    return -1;
-                }
-            }
-
-            break;
-
-        default:
-            cerr << "Une erreur s'est produite dans l'appel d'un critère de sélection" << endl;
-            return -1;
+        }
     }
 
     cout << endl << "---- " << countSave << " Trajet(s) correctement sauvegardée(s)---- " << endl;
@@ -195,7 +91,7 @@ int Catalogue::Charge(string cheminAcces,CritereSelection critere)
 // Algorithme :
 //
 {
-    int countSave;
+    int countCharge;
     char typeTrajet[15];
     int choixCritereVille;
     Trajet* ptr_trajet;
@@ -217,7 +113,7 @@ int Catalogue::Charge(string cheminAcces,CritereSelection critere)
                     ptr_trajet = construitTrajetAvecLecture(fichier);
                     if(ptr_trajet!=nullptr)
                     {
-                        ++countSave;
+                        ++countCharge;
                         listeTraj.AddTrajet(ptr_trajet);
                     }
                 }
@@ -234,7 +130,7 @@ int Catalogue::Charge(string cheminAcces,CritereSelection critere)
                         ptr_trajet = construitTrajetAvecLecture(fichier);
                         if(ptr_trajet!=nullptr && ptr_trajet->GetType()=="TS") // c'est bien un trajet simple
                         {
-                            ++countSave;
+                            ++countCharge;
                             listeTraj.AddTrajet(ptr_trajet);
                         }
                         else if(ptr_trajet!=nullptr) // c'est un trajet compose
@@ -251,7 +147,7 @@ int Catalogue::Charge(string cheminAcces,CritereSelection critere)
                         ptr_trajet = construitTrajetAvecLecture(fichier);
                         if(ptr_trajet!=nullptr && ptr_trajet->GetType()=="TC") // c'est bien un trajet compose
                         {
-                            countSave++;
+                            ++countCharge;
                             listeTraj.AddTrajet(ptr_trajet);
                         }
                         else if(ptr_trajet!=nullptr)// c'est un trajet simple
@@ -286,7 +182,7 @@ int Catalogue::Charge(string cheminAcces,CritereSelection critere)
                             {
                                 if(strcmp(ptr_trajet->GetVilleDepart(),villeDepartCritereVille)==0)
                                 {
-                                    ++countSave;
+                                    ++countCharge;
                                     listeTraj.AddTrajet(ptr_trajet);
                                 }
                                 else
@@ -307,7 +203,7 @@ int Catalogue::Charge(string cheminAcces,CritereSelection critere)
                             {
                                 if(strcmp(ptr_trajet->GetVilleArrivee(),villeArriveeCritereVille)==0)
                                 {
-                                    ++countSave;
+                                    ++countCharge;
                                     listeTraj.AddTrajet(ptr_trajet);
                                 }
                                 else
@@ -330,7 +226,7 @@ int Catalogue::Charge(string cheminAcces,CritereSelection critere)
                             {
                                 if(strcmp(ptr_trajet->GetVilleDepart(),villeDepartCritereVille)==0 && strcmp(ptr_trajet->GetVilleArrivee(),villeArriveeCritereVille)==0)
                                 {
-                                    ++countSave;
+                                    ++countCharge;
                                     listeTraj.AddTrajet(ptr_trajet);
                                 }
                                 else
@@ -379,7 +275,7 @@ int Catalogue::Charge(string cheminAcces,CritereSelection critere)
                     {
                         if(countTrajet>=borneInfInterv && countTrajet<=borneSupInterv)
                         {
-                            ++countSave;
+                            ++countCharge;
                             listeTraj.AddTrajet(ptr_trajet);
                         }
                         else
@@ -402,7 +298,7 @@ int Catalogue::Charge(string cheminAcces,CritereSelection critere)
         return -1;
     }
 
-    cout << endl << "---- " << countSave << " Trajet(s) correctement ajouté(s)---- " << endl;
+    cout << endl << "---- " << countCharge << " Trajet(s) correctement ajouté(s)---- " << endl;
     return 0;
 
 } //----- Fin de Charge
@@ -634,9 +530,159 @@ Catalogue::~Catalogue ( )
 
 //----------------------------------------------------- Méthodes protégées
 
+bool Catalogue::respectCriteria(Trajet * trajet, CritereSelection critere, string param1, string param2, int param3)
+// Algorithme
+// Lecture via le pointeur de trajets si les attributs du trajet correspondent au critère demandé.
+// L'emploi d'un string permet l'utilisation des '==' pour la comparaison.
+// Utilisation d'stoi pour
+{
+
+    bool useable = false;
+
+    string choix;
+    string vDepart;
+    string vArrivee;
+    int numero(0);
+    int intervalStart(0);
+    int intervalEnd(0);
+
+    switch(critere)
+    {
+        case SANS : //Trajet respecte toujours le critère s'il n'existe pas
+
+            useable = true;
+            break;
+
+        case TYPE : //Trajet doit être du bon type
+
+            choix = param1;
+
+            if(trajet->GetType()==choix)
+            {
+                useable = true;
+            }
+
+            break;
+
+        case VILLE : // Trajet doit respecter la ville de départ et/ou d'arrivée
+                     // Si il n'y a ni ville de départ ni d'arrivée, revient à aucun critère
+
+            vDepart = param1;
+            vArrivee = param2;
+
+            useable = true;
+
+            if(!vDepart.empty() && vDepart!=trajet->GetVilleDepart())
+            {
+                useable=false;
+            }
+
+            if(!vArrivee.empty() && vArrivee!=trajet->GetVilleArrivee())
+            {
+                useable=false;
+            }
+
+            break;
+
+        case TRAJETS : //Trajet bon si son numéro est bien dans l'intervalle demandé
+
+            intervalStart = stoi(param1);
+            intervalEnd = stoi(param2);
+            numero = param3;
+
+            if(numero >= intervalStart && numero <= intervalEnd)
+            {
+                useable = true;
+            }
+
+            break;
+
+        default:
+            cerr << "Une erreur s'est produite dans l'appel d'un critère de sélection" << endl;
+            useable = false;
+            break;
+    }
+
+    return useable;
+} // ------- Fin de respectCriteria
+
+void Catalogue::askParameters(CritereSelection critere, string & param1, string & param2)
+//Algorithme
+//  Respect des critères :
+//      Critère SANS : param1 --> / - param2 --> /
+//      Critère TYPE : param1 --> TS ou TC - param2 --> /
+//      Critère VILLE : param1 --> vDepart - param2 --> vArrivee
+//      Critère TRAJETS cad entre [n,m] : param1 --> n - param2 --> m
+// Interfaçage avec l'utilisateur en fonction du critère demandé.
+// Emploi d'une conversion string -> int et int -> string via stoi et to_string pour le parametre 2 lors du choix
+// de l'intervalle.
+{
+
+
+    string choix("");
+    switch(critere) //Entrées des paramètres
+    {
+        case SANS :
+            break;
+
+        case TYPE :
+            cout << "Sélection du type de trajets souhaité lors de la sauvegarde\n\t* TS\n\t* TC" << endl;
+
+            //A AMELIORER POUR CHECK LES ERREURS DE SAISIE
+            cin >> param1;
+            break;
+
+        case VILLE :
+            cout << "Souhaitez vous sélectionner une ville de départ ? (Y/N)" << endl;
+
+            //A AMELIORER POUR CHECK LES ERREURS DE SAISIE
+            cin >> choix;
+
+            if(choix=="Y" || choix == "y")
+            {
+                cout << "Saisir la ville de départ :" << endl;
+                cin >> param1;
+            }
+
+            cout << "Souhaitez vous sélectionner une ville d'arrivée ? (Y/N)" << endl;
+
+            //A AMELIORER POUR CHECK LES ERREURS DE SAISIE
+            cin >> choix;
+
+            if(choix=="Y" || choix == "y")
+            {
+                cout << "Saisir la ville d'arrivée :" << endl;
+                cin >> param2;
+            }
+            break;
+
+        case TRAJETS :
+            cout << "Saisir la borne inférieure n de l'intervalle [n,m] avec n>=1 : " << endl;
+
+            //A AMELIORER POUR CHECK LES ERREURS DE SAISIE
+            cin >> param1;
+
+            cout << "Saisir la borne supérieure m de l'intervalle [n,m] avec m>=n : " << endl;
+
+            //A AMELIORER POUR CHECK LES ERREURS DE SAISIE
+            cin >> param2;
+
+            if(stoi(param2)>listeTraj.GetNbTrajets())
+            {
+                cerr << "Borne supérieure trop haute, mise à la taille maximale automatique." << endl;
+                param2=to_string(listeTraj.GetNbTrajets());
+            }
+            break;
+
+        default:
+            cerr << "Une erreur s'est produite dans l'appel d'un critère de sélection" << endl;
+            break;
+    }
+} // ----- Fin de askParameters
+
 int Catalogue::putInFile(ostream &stream, int &counter, ostringstream &buffer)
 // Algorithme
-//
+// Si le stream est bien ouvert, écrit l'intégralité du buffer à l'interieur et augmenter le compteur.
 {
     if (!buffer.str().empty()) {
         if (stream) {

@@ -115,24 +115,51 @@ public:
 protected:
 //----------------------------------------------------- Méthodes protégées
 
-    int putInFile(ostream & stream, int & counter, ostringstream & buffer);
-    // Mode d'emploi ;
+    bool respectCriteria(Trajet * trajet, CritereSelection critere, string param1, string param2, int param3);
+    // Mode d'emploi
+    // Pour le trajet pointé par le pointeur passé en paramètre, renvoi vrai s'il respecte critere (en se servant
+    // des paramètres1 et 2 si besoin). Renvoi faux sinon.
+    // Permet de filtrer les trajets.
+    //
+    // Pour les paramètres :
+    //  Critère SANS : param1 --> / - param2 --> / - param3 --> /
+    //  Critère TYPE : param1 --> TS ou TC - param2 --> / - param3 --> /
+    //  Critère VILLE : param1 --> vDepart - param2 --> vArrivee - param3 --> /
+    //  Critère TRAJETS cad entre [n,m] : param1 --> n - param2 --> m - param3 --> numero du trajet dans la liste
     //
     // Contrat :
+    // Les paramètres correspondent bien au critère demandé.
+
+    void askParameters(CritereSelection critere, string & param1, string & param2);
+    // Mode d'emploi
+    // Rempli les parametres 1, 2 et 3 en fonction du critere selectionné. Voir la mode d'emploi de la méthode au
+    // desssus (respectCriteria) pour comprendre leur utilité.
+    // Contrat :
     //
+
+    int putInFile(ostream & stream, int & counter, ostringstream & buffer);
+    // Mode d'emploi ;
+    // Insère dans le stream passé en parametre le buffer.
+    // Incrémente aussi le counter de 1, signifiant l'ajout d'une ligne.
+    // Renvoi 0 si tout s'est bien passé, -1 sinon
+    // Contrat :
+    // Le stream de sortie doit être au préalable correctement ouvert
 
     ostringstream & createBuffer(ostringstream & buffer, Trajet* traj);
     // Mode d'emploi :
-    // Affiche un message dans la console demandant à l'utilisateur de saisir une ville
-    // d'arrivée, et renvoie la saisie de l'utilisateur à l'aide d'un pointeur
+    // Rempli le buffer d'entrée avec les caractéristique du trajet pointé par le pointeur passé en paramètre.
+    // Il respecte le "template" expliqué dans le compte rendu pour la création du buffer.
+    // Renvoi le buffer rempli si tout s'est bien passé, un buffer vide sinon.
     // Contrat :
-    //
+    // Le pointeur de trajet passé en paramètre n'est pas le pointeur null.
 
     Trajet* construitTrajetAvecLecture(ifstream & fichier);
     // Mode d'emploi :
-    //
+    // Instancie de façon dynamique un trajet correspondant à la prochaine ligne disponible dans le file stream passé
+    // en paramètre.
     // Contrat :
     // Il faut que le fichier soit correctement ouvert (vérification en amont)
+    // Il faut que la syntaxe respecte la "template" décrite dans notre compte rendu.
 
     char * askVilleArrivee();
     // Mode d'emploi :
