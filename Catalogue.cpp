@@ -91,217 +91,55 @@ int Catalogue::Charge(string cheminAcces,CritereSelection critere)
 // Algorithme :
 //
 {
-    int countCharge(0);
-    char typeTrajet[15];
-    int choixCritereVille(0);
-    Trajet* ptr_trajet = nullptr;
-    ifstream fichier(cheminAcces);
-    char villeDepartCritereVille[TAILLE_ENTREE_VILLE];
-    char villeArriveeCritereVille[TAILLE_ENTREE_VILLE];
-    int borneInfInterv(0);
-    int borneSupInterv(0);
-    int countTrajet=0;
+  ifstream fichierEntree(cheminAcces);
 
-    // on vérifie que le fichier a bien été ouvert
-    if(fichier.is_open())
+  cout<<"Chargement de trajets"<<endl;
+
+  if(!fichierEntree.is_open())
+  {
+      cerr << "Une erreur s'est produite lors de l'ouverture du fichier. Abandon" << endl;
+      return -1;
+  }
+
+  cout << "Fichier bien ouvert" << endl;
+
+  //Critères d'entrées du filtre
+  string param1("");
+  string param2("");
+  int param3(0);
+
+  askParameters(critere,param1,param2);
+
+  int countSave(0);
+  int i(0);
+  Trajet* ptr_trajet = nullptr;
+
+  //Passage du filtre et mise du catalogue
+  while(fichierEntree)
+  {
+    ptr_trajet = construitTrajetAvecLecture(fichierEntree);
+    if(ptr_trajet!=nullptr)
     {
-        switch(critere)
-        {
-            case SANS: // charge tous les trajets
-                while(fichier)
-                {
-                    ptr_trajet = construitTrajetAvecLecture(fichier);
-                    if(ptr_trajet!=nullptr)
-                    {
-                        ++countCharge;
-                        listeTraj.AddTrajet(ptr_trajet);
-                    }
-                }
-                break;
-
-            case TYPE: // charge uniquement les TS ou les TC
-                cout<<"Sélection des trajets\r\n\tSimples\r\n\tComposes"<<endl;
-                cin>>typeTrajet;
-                //on veut les trajets simples
-                if(strcmp(typeTrajet,"Simples")==0)
-                {
-                    while(fichier) // tant que l'on n'a pas atteint la fin
-                    {
-                        ptr_trajet = construitTrajetAvecLecture(fichier);
-                        if(ptr_trajet!=nullptr && ptr_trajet->GetType()=="TS") // c'est bien un trajet simple
-                        {
-                            ++countCharge;
-                            listeTraj.AddTrajet(ptr_trajet);
-                        }
-                        else if(ptr_trajet!=nullptr) // c'est un trajet compose
-                        {
-                            delete ptr_trajet;
-                        }
-                    }
-                }
-                    //on veut les trajets composes
-                else if(strcmp(typeTrajet,"Composes")==0)
-                {
-                    while(fichier)
-                    {
-                        ptr_trajet = construitTrajetAvecLecture(fichier);
-                        if(ptr_trajet!=nullptr && ptr_trajet->GetType()=="TC") // c'est bien un trajet compose
-                        {
-                            ++countCharge;
-                            listeTraj.AddTrajet(ptr_trajet);
-                        }
-                        else if(ptr_trajet!=nullptr)// c'est un trajet simple
-                        {
-                            delete ptr_trajet;
-                        }
-                    }
-                }
-                else
-                {
-                    cerr<<"Saisie non valide"<<endl;
-                }
-                break;
-
-            case VILLE: // charge en fonction de la ville de départ et/ou d'arrivée
-                cout<<"Quel critère de ville voulez-vous choisir ?"<<endl;
-                cout<<"\t1: Ville de départ"<<endl;
-                cout<<"\t2: Ville d'arrivée"<<endl;
-                cout<<"\t3: Ville de départ et d'arrivée"<<endl;
-                cin>>choixCritereVille;
-                cin.ignore();
-
-                switch(choixCritereVille)
-                {
-                    case 1:
-                        cout<<"Entrez la ville de départ :"<<endl;
-                        cin.getline(villeDepartCritereVille,TAILLE_ENTREE_VILLE);
-                        while(fichier)
-                        {
-                            ptr_trajet = construitTrajetAvecLecture(fichier);
-                            if(ptr_trajet!=nullptr)
-                            {
-                                if(strcmp(ptr_trajet->GetVilleDepart(),villeDepartCritereVille)==0)
-                                {
-                                    ++countCharge;
-                                    listeTraj.AddTrajet(ptr_trajet);
-                                }
-                                else
-                                {
-                                    delete ptr_trajet;
-                                }
-                            }
-                        }
-                        break;
-
-                    case 2:
-                        cout<<"Entrez la ville d'arrivée :"<<endl;
-                        cin.getline(villeArriveeCritereVille,TAILLE_ENTREE_VILLE);
-                        while(fichier)
-                        {
-                            ptr_trajet = construitTrajetAvecLecture(fichier);
-                            if(ptr_trajet!=nullptr)
-                            {
-                                if(strcmp(ptr_trajet->GetVilleArrivee(),villeArriveeCritereVille)==0)
-                                {
-                                    ++countCharge;
-                                    listeTraj.AddTrajet(ptr_trajet);
-                                }
-                                else
-                                {
-                                    delete ptr_trajet;
-                                }
-                            }
-                        }
-                        break;
-
-                    case 3:
-                        cout<<"Entrez la ville de départ :"<<endl;
-                        cin.getline(villeDepartCritereVille,TAILLE_ENTREE_VILLE);
-                        cout<<"Entrez la ville d'arrivée :"<<endl;
-                        cin.getline(villeArriveeCritereVille,TAILLE_ENTREE_VILLE);
-                        while(fichier)
-                        {
-                            ptr_trajet = construitTrajetAvecLecture(fichier);
-                            if(ptr_trajet!=nullptr)
-                            {
-                                if(strcmp(ptr_trajet->GetVilleDepart(),villeDepartCritereVille)==0 && strcmp(ptr_trajet->GetVilleArrivee(),villeArriveeCritereVille)==0)
-                                {
-                                    ++countCharge;
-                                    listeTraj.AddTrajet(ptr_trajet);
-                                }
-                                else
-                                {
-                                    delete ptr_trajet;
-                                }
-                            }
-                        }
-                        break;
-
-                    default:
-                        cerr<<"Une erreur est survenue lors de la saisie"<<endl;
-                        return -1;
-                }
-
-                /*
-                while(fichier)
-                {
-                    ptr_trajet = construitTrajetAvecLecture(fichier);
-                    if(ptr_trajet!=nullptr)
-                    {
-                        ++countSave;
-                        listeTraj.AddTrajet(ptr_trajet);
-                    }
-                }
-                 */
-                break;
-
-            case TRAJETS: // charge en fonction du numero de la ligne
-                cout<<"Entrez la borne inférieure de l'intervalle de trajets (nombre >=1)"<<endl;
-                cin>>borneInfInterv;
-                cin.ignore();
-                cout<<"Entrez la borne supérieure de l'intervalle de trajets (nombre >= borne inférieure)"<<endl;
-                cin>>borneSupInterv;
-                cin.ignore();
-                if(borneInfInterv<1 || borneSupInterv<borneInfInterv)
-                {
-                    cerr<<"Erreur dans la saisie de l'intervalle"<<endl;
-                    return -1;
-                }
-                while(fichier && countTrajet<=borneSupInterv)
-                {
-                    countTrajet++;
-                    ptr_trajet=construitTrajetAvecLecture(fichier);
-                    if(ptr_trajet!=nullptr)
-                    {
-                        if(countTrajet>=borneInfInterv && countTrajet<=borneSupInterv)
-                        {
-                            ++countCharge;
-                            listeTraj.AddTrajet(ptr_trajet);
-                        }
-                        else
-                        {
-                            delete ptr_trajet;
-                        }
-                    }
-                }
-                break;
-
-            default:
-                cerr << "Une erreur s'est produite dans l'appel d'un critère de sélection" << endl;
-                return -1;
-
-        }
+      ++param3;
+      if(respectCriteria(ptr_trajet,critere,param1,param2,param3))
+      {
+        listeTraj.AddTrajet(ptr_trajet);
+        ++countSave;
+      }
+      else
+      {
+        delete ptr_trajet;
+      }
     }
-    else
-    {
-        cerr<<"Une erreur s'est produite lors de l'ouverture du fichier"<<endl;
-        return -1;
-    }
+  }
 
-    cout << endl << "---- " << countCharge << " Trajet(s) correctement ajouté(s)---- " << endl;
-    return 0;
+  cout << endl << "---- " << countSave << " Trajet(s) correctement chargé(s)---- " << endl;
 
+  fichierEntree.close();
+
+  return 0;
 } //----- Fin de Charge
+
 
 void Catalogue::AddTrajetSimple()
 // Algorithme :
@@ -667,11 +505,11 @@ void Catalogue::askParameters(CritereSelection critere, string & param1, string 
             //A AMELIORER POUR CHECK LES ERREURS DE SAISIE
             cin >> param2;
 
-            if(stoi(param2)>listeTraj.GetNbTrajets())
+            /*if(stoi(param2)>listeTraj.GetNbTrajets())
             {
                 cerr << "Borne supérieure trop haute, mise à la taille maximale automatique." << endl;
                 param2=to_string(listeTraj.GetNbTrajets());
-            }
+            }*/
             break;
 
         default:
