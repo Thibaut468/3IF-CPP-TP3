@@ -56,11 +56,18 @@ int Catalogue::Sauvegarde(string cheminAcces, CritereSelection critere)
     cout << "Fichier bien ouvert" << endl;
 
     //Critères d'entrées du filtre
-    string param1("");
-    string param2("");
+    string param1;
+    string param2;
     int param3(0);
 
     askParameters(critere,param1,param2);
+
+    //Remise à l'échelle vis à vis du catalogue si besoin en est.
+    if(stoi(param2)>listeTraj.GetNbTrajets())
+    {
+        cerr << "Borne supérieure trop haute, mise à la taille maximale du catalogue automatique." << endl;
+        param2=to_string(listeTraj.GetNbTrajets());
+    }
 
     int countSave(0);
 
@@ -91,53 +98,52 @@ int Catalogue::Charge(string cheminAcces,CritereSelection critere)
 // Algorithme :
 //
 {
-  ifstream fichierEntree(cheminAcces);
+    ifstream fichierEntree(cheminAcces);
 
-  cout<<"Chargement de trajets"<<endl;
+    cout<<"Chargement de trajets"<<endl;
 
-  if(!fichierEntree.is_open())
-  {
-      cerr << "Une erreur s'est produite lors de l'ouverture du fichier. Abandon" << endl;
-      return -1;
-  }
-
-  cout << "Fichier bien ouvert" << endl;
-
-  //Critères d'entrées du filtre
-  string param1("");
-  string param2("");
-  int param3(0);
-
-  askParameters(critere,param1,param2);
-
-  int countSave(0);
-  int i(0);
-  Trajet* ptr_trajet = nullptr;
-
-  //Passage du filtre et mise du catalogue
-  while(fichierEntree)
-  {
-    ptr_trajet = construitTrajetAvecLecture(fichierEntree);
-    if(ptr_trajet!=nullptr)
+    if(!fichierEntree.is_open())
     {
-      ++param3;
-      if(respectCriteria(ptr_trajet,critere,param1,param2,param3))
-      {
-        listeTraj.AddTrajet(ptr_trajet);
-        ++countSave;
-      }
-      else
-      {
-        delete ptr_trajet;
-      }
+        cerr << "Une erreur s'est produite lors de l'ouverture du fichier. Abandon" << endl;
+        return -1;
     }
-  }
 
-  cout << endl << "---- " << countSave << " Trajet(s) correctement chargé(s)---- " << endl;
+    cout << "Fichier bien ouvert" << endl;
 
-  fichierEntree.close();
+    //Critères d'entrées du filtre
+    string param1;
+    string param2;
+    int param3(0);
 
-  return 0;
+    askParameters(critere,param1,param2);
+
+    int countCharge(0);
+    Trajet* ptr_trajet = nullptr;
+
+    //Passage du filtre et chargement du catalogue
+    while(fichierEntree)
+    {
+        ptr_trajet = construitTrajetAvecLecture(fichierEntree);
+        if(ptr_trajet!=nullptr)
+        {
+            ++param3;
+            if(respectCriteria(ptr_trajet,critere,param1,param2,param3))
+            {
+                listeTraj.AddTrajet(ptr_trajet);
+                ++countCharge;
+            }
+            else
+            {
+                delete ptr_trajet;
+            }
+        }
+    }
+
+    cout << endl << "---- " << countCharge << " Trajet(s) correctement chargé(s)---- " << endl;
+
+    fichierEntree.close();
+
+    return 0;
 } //----- Fin de Charge
 
 
@@ -336,8 +342,6 @@ ostream & operator << (ostream & flux, const Catalogue & unCatalogue)
 } //----- Fin de surcharge opérateur <<
 
 
-
-
 //-------------------------------------------- Constructeurs - destructeur
 
 Catalogue::Catalogue () : listeTraj()
@@ -403,7 +407,7 @@ bool Catalogue::respectCriteria(Trajet * trajet, CritereSelection critere, strin
             break;
 
         case VILLE : // Trajet doit respecter la ville de départ et/ou d'arrivée
-                     // Si il n'y a ni ville de départ ni d'arrivée, revient à aucun critère
+            // Si il n'y a ni ville de départ ni d'arrivée, revient à aucun critère
 
             vDepart = param1;
             vArrivee = param2;
@@ -505,11 +509,6 @@ void Catalogue::askParameters(CritereSelection critere, string & param1, string 
             //A AMELIORER POUR CHECK LES ERREURS DE SAISIE
             cin >> param2;
 
-            /*if(stoi(param2)>listeTraj.GetNbTrajets())
-            {
-                cerr << "Borne supérieure trop haute, mise à la taille maximale automatique." << endl;
-                param2=to_string(listeTraj.GetNbTrajets());
-            }*/
             break;
 
         default:
