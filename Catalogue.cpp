@@ -96,7 +96,10 @@ int Catalogue::Sauvegarde(string cheminAcces, CritereSelection critere)
 
 int Catalogue::Charge(string cheminAcces,CritereSelection critere)
 // Algorithme :
+// Lit chaque ligne du fichier passé en paramètre et construit un trajet à partir des informations lues.
+// Ce trajet est alors ajouté au catalogue si il respecte le critère indiqué, sinon il est détruit.
 //
+// La valeur de retour indique si le chargement a bien fonctionné (0) ou si il y a eu une erreur (-1).
 {
     ifstream fichierEntree(cheminAcces);
 
@@ -115,6 +118,7 @@ int Catalogue::Charge(string cheminAcces,CritereSelection critere)
     string param2;
     int param3(0);
 
+    // on relève les paramètres donnés par l'utilisateur, en fonction du critère
     askParameters(critere,param1,param2);
 
     int countCharge(0);
@@ -127,6 +131,7 @@ int Catalogue::Charge(string cheminAcces,CritereSelection critere)
         if(ptr_trajet!=nullptr)
         {
             ++param3;
+            // on regarde si le trajet considéré remplit le critère, en fonction des paramètres que l'utilisateur a fournis
             if(respectCriteria(ptr_trajet,critere,param1,param2,param3))
             {
                 listeTraj.AddTrajet(ptr_trajet);
@@ -613,7 +618,10 @@ ostringstream & Catalogue::createBuffer(ostringstream &buffer, Trajet *traj)
 
 Trajet* Catalogue::construitTrajetAvecLecture(ifstream & fichier)
 // Algorithme :
+// Cette méthode va lire une ligne entière du fichier passé en paramètre et construire un trajet à partir de cette ligne.
+// La méthode s'adapte au cas où la ligne correspond à un trajet simple ou composé et lit une à une les informations concernant le trajet en cours de construction.
 //
+// Au final elle retourne un pointeur de type Trajet, qui pointe vers le trajet qui a été créé.
 {
     char typeTrajet[15];
     char villeDepart[TAILLE_ENTREE_VILLE];

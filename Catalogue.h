@@ -54,9 +54,12 @@ public:
 
     int Charge(string cheminAcces,CritereSelection critere);
     // Mode d'emploi :
+    // Méthode permettant de charger depuis un fichier passé en paramètre tous les trajets contenu dedans
+    // qui respectent le critère de sélection, également donné en paramètre.
     //
     // Contrat :
-    //
+    // Il faut que le critère soit bien valide (présent dans l'enum CritereSelection) et que les trajets
+    // stockés dans le fichier respectent la syntaxe décrite dans le compte rendu
 
     void AddTrajetSimple();
     // Mode d'emploi :
