@@ -29,8 +29,12 @@ enum CritereSelection {SANS, TYPE, VILLE, TRAJETS};
 // Catalogue est la classe principale de l'application: elle possède un seul attribut qui est
 // un objet ListeTrajets
 // elle contient les méthodes permettant de créer de nouveaux trajets, ainsi que de rechercher
-// des trajets simples et complexes, et enfin une méthode permettant d'afficher les trajets existants
+// des trajets simples et complexes, et enfin une méthode permettant d'afficher les trajets existants.
 //
+// Elle possède aussi une méthode permettant de sauvegarder ses trajets dans un fichier externe et une autre
+// pour les restituer. Il existe alors différentes méthodes protégées pour interagir avec l'utilisateur et d'autres
+// pour fonctionner comme un filtre sur les trajets, permettant de savoir s'il faut ou non les sauvegarder/restituer
+// en fonction de critères de sélections.
 //------------------------------------------------------------------------
 
 class Catalogue

@@ -42,18 +42,33 @@ int Catalogue::Sauvegarde(string cheminAcces, CritereSelection critere)
 // Le matching des paramètres est décrit dans l'en tête de la fonction respectCriteria dans l'interface Catalogue.h.
 {
     //ofstream fichierDeSortie(cheminAcces,fstream::app);
-    ofstream fichierDeSortie(cheminAcces,fstream::out);
+    string out;
+
+    cout << "Souhaitez vous écraser les données présentes si le fichier existe déjà ? (Y/N)" << endl;
+    cin >> out;
+
+    while(cin.fail() || !(out == "Y" || out == "y" || out == "N" || out == "n"))
+    {
+        cin.clear();
+        cin.ignore(10000,'\n');
+
+        cout << "Mauvaise saisie. Veuillez recommencer." << endl;
+        cin >> out;
+    }
+
+    ofstream fichierDeSortie(cheminAcces,((out=="Y" || out == "y") ? (fstream::out) : (fstream::app)));
+
     ostringstream buffer;
 
-    cout << "Sauvegarde" << endl;
+    //cout << "Sauvegarde" << endl;
 
     if(!fichierDeSortie)
     {
-        cerr << "Une erreur s'est produite lors de l'ouverture du fichier. Abandon" << endl;
+        cerr << "Une erreur s'est produite lors de l'ouverture du fichier. Abandon de la sauvegarde." << endl;
         return -1;
     }
 
-    cout << "Fichier bien ouvert" << endl;
+    cout << "Fichier bien ouvert." << endl;
 
     //Critères d'entrées du filtre
     string param1;
@@ -63,7 +78,7 @@ int Catalogue::Sauvegarde(string cheminAcces, CritereSelection critere)
     askParameters(critere,param1,param2);
 
     //Remise à l'échelle vis à vis du catalogue si besoin en est.
-    if(stoi(param2)>listeTraj.GetNbTrajets())
+    if(critere == TRAJETS && stoi(param2)>listeTraj.GetNbTrajets())
     {
         cerr << "Borne supérieure trop haute, mise à la taille maximale du catalogue automatique." << endl;
         param2=to_string(listeTraj.GetNbTrajets());
@@ -181,7 +196,7 @@ void Catalogue::AddTrajetCompose()
     {
         cerr << "Erreur, veuillez entrer un entier" <<endl;
         cin.clear();          //on clear les erreurs
-        cin.ignore();         // on ignore le prochain caractère
+        cin.ignore(10000,'\n');         // on ignore la prochaine ligne
         cin >> nbTrajets;             //on redemande la valeur;
         cin.ignore();
     }
@@ -469,45 +484,108 @@ void Catalogue::askParameters(CritereSelection critere, string & param1, string 
 
         case TYPE :
             cout << "Sélection du type de trajets souhaité lors de la sauvegarde\n\t* TS\n\t* TC" << endl;
-
-            //A AMELIORER POUR CHECK LES ERREURS DE SAISIE
             cin >> param1;
+
+            while(cin.fail() || !(param1 == "TC" || param1 == "tc" || param1 == "TS" || param1 == "ts"))
+            {
+                cin.clear();
+                cin.ignore(10000,'\n');
+
+                cout << "Mauvaise saisie. Veuillez recommencer." << endl;
+                cin >> param1;
+            }
+
             break;
 
         case VILLE :
             cout << "Souhaitez vous sélectionner une ville de départ ? (Y/N)" << endl;
-
-            //A AMELIORER POUR CHECK LES ERREURS DE SAISIE
             cin >> choix;
+
+            while(cin.fail() || !(choix == "Y" || choix == "y" || choix == "N" || choix == "n"))
+            {
+                cin.clear();
+                cin.ignore(10000,'\n');
+
+                cout << "Mauvaise saisie. Veuillez recommencer." << endl;
+                cin >> choix;
+            }
 
             if(choix=="Y" || choix == "y")
             {
                 cout << "Saisir la ville de départ :" << endl;
                 cin >> param1;
+
+                while(cin.fail())
+                {
+                    cin.clear();
+                    cin.ignore(10000,'\n');
+
+                    cout << "Mauvaise saisie. Veuillez recommencer." << endl;
+                    cin >> param1;
+                }
             }
 
             cout << "Souhaitez vous sélectionner une ville d'arrivée ? (Y/N)" << endl;
-
-            //A AMELIORER POUR CHECK LES ERREURS DE SAISIE
             cin >> choix;
+
+            while(cin.fail() || !(choix == "Y" || choix == "y" || choix == "N" || choix == "n"))
+            {
+                cin.clear();
+                cin.ignore(10000,'\n');
+
+                cout << "Mauvaise saisie. Veuillez recommencer." << endl;
+                cin >> choix;
+            }
 
             if(choix=="Y" || choix == "y")
             {
                 cout << "Saisir la ville d'arrivée :" << endl;
                 cin >> param2;
+
+                while(cin.fail())
+                {
+                    cin.clear();
+                    cin.ignore(10000,'\n');
+
+                    cout << "Mauvaise saisie. Veuillez recommencer." << endl;
+                    cin >> param2;
+                }
+
             }
             break;
 
         case TRAJETS :
             cout << "Saisir la borne inférieure n de l'intervalle [n,m] avec n>=1 : " << endl;
 
-            //A AMELIORER POUR CHECK LES ERREURS DE SAISIE
-            cin >> param1;
+            int tmpForErrorsInf;
+            cin >> tmpForErrorsInf;
+
+            while(cin.fail() || tmpForErrorsInf<1)
+            {
+                cin.clear();
+                cin.ignore(10000,'\n');
+
+                cout << "Mauvaise saisie. Veuillez recommencer." << endl;
+                cin >> tmpForErrorsInf;
+            }
+
+            param1=to_string(tmpForErrorsInf);
 
             cout << "Saisir la borne supérieure m de l'intervalle [n,m] avec m>=n : " << endl;
 
-            //A AMELIORER POUR CHECK LES ERREURS DE SAISIE
-            cin >> param2;
+            int tmpForErrorsSup;
+            cin >> tmpForErrorsSup;
+
+            while(cin.fail() || tmpForErrorsSup<tmpForErrorsInf)
+            {
+                cin.clear();
+                cin.ignore(10000,'\n');
+
+                cout << "Mauvaise saisie. Veuillez recommencer." << endl;
+                cin >> tmpForErrorsSup;
+            }
+
+            param2=to_string(tmpForErrorsSup);
 
             break;
 
